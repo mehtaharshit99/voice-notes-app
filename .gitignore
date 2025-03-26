@@ -1,0 +1,24 @@
+# Ignore Python virtual environments
+venv/
+new_env/
+
+# Ignore system files
+__pycache__/
+*.pyc
+
+# Ignore large libraries
+*.dll
+*.lib
+*.so
+*.exe
+
+# Ignore secret keys
+secrets.toml
+voice-notes-transcription-firebase-adminsdk.json
+
+# Ignore dataset files
+*.mp3
+*.mp4
+*.wav
+*.zip
+*.tar.gz
