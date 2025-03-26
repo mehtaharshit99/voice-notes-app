@@ -1,0 +1,11 @@
+streamlit
+firebase-admin
+sounddevice
+numpy
+scipy
+wave
+faster-whisper
+transformers
+torch
+sentencepiece
+
