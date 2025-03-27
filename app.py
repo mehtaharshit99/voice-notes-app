@@ -1,30 +1,68 @@
 import streamlit as st
 import os
-import time
 import wave
+import time
+import numpy as np
+import sounddevice as sd
 from pydub import AudioSegment
 from model.whisper import transcribe_audio
 from model.summarizer import summarize_text
 from firebase_config import save_transcription, get_all_transcriptions
 from fpdf import FPDF
 
-st.title("🎤 Voice Notes AI - Upload, Transcribe & Download")
+# Set up Streamlit UI
+st.title("🎤 Voice Notes AI - Record, Upload & Transcribe")
 
+# Set FFmpeg path (for Pydub)
 AudioSegment.converter = "C:\\ffmpeg\\bin\\ffmpeg.exe"
 
-# Create a folder for recordings
+# Create recordings directory if it doesn't exist
 os.makedirs("recordings", exist_ok=True)
 
-# 📂 **Upload a .wav File**
+# Audio recording settings
+SAMPLE_RATE = 44100  # CD quality
+CHANNELS = 1  # Mono audio
+
+def record_audio(duration=5, filename="recordings/recorded_audio.wav"):
+    """Records audio for a given duration and saves it as a WAV file."""
+    st.info(f"Recording for {duration} seconds... 🎙️")
+    
+    # Record audio
+    recording = sd.rec(int(duration * SAMPLE_RATE), samplerate=SAMPLE_RATE, channels=CHANNELS, dtype=np.int16)
+    sd.wait()  # Wait for recording to finish
+    
+    # Save as WAV file
+    with wave.open(filename, "wb") as wf:
+        wf.setnchannels(CHANNELS)
+        wf.setsampwidth(2)  # 16-bit PCM
+        wf.setframerate(SAMPLE_RATE)
+        wf.writeframes(recording.tobytes())
+    
+    st.success(f"✅ Recording saved as {filename}")
+    return filename
+
+# 📌 **Audio Recording**
+st.subheader("🎙️ Record Audio")
+record_seconds = st.slider("Select recording duration (seconds)", 1, 10, 5)
+
+if st.button("🔴 Start Recording"):
+    recorded_audio = record_audio(duration=record_seconds)
+    st.audio(recorded_audio, format="audio/wav")
+    st.success("🎉 Recording complete! You can now transcribe it.")
+
+# 📂 **Upload an Audio File**
 st.subheader("📂 Upload an Audio File")
 uploaded_file = st.file_uploader("Choose a WAV file", type=["wav"])
 
+audio_path = None
 if uploaded_file:
     audio_path = os.path.join("recordings", uploaded_file.name)
     with open(audio_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
     st.success(f"✅ File uploaded and saved as {audio_path}")
 
+# **Proceed with Transcription if a file is available**
+if audio_path:
     # 📜 **Transcription**
     st.write("⏳ Transcribing...")
     transcription = transcribe_audio(audio_path)
