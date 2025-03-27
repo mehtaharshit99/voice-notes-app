@@ -10,6 +10,8 @@ from fpdf import FPDF
 
 st.title("🎤 Voice Notes AI - Upload, Transcribe & Download")
 
+AudioSegment.converter = "C:\\ffmpeg\\bin\\ffmpeg.exe"
+
 # Create a folder for recordings
 os.makedirs("recordings", exist_ok=True)
 
