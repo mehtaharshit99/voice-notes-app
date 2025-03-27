@@ -6,10 +6,10 @@ import streamlit as st
 # Check if Firebase is already initialized
 if not firebase_admin._apps:
     # Load Firebase credentials from Streamlit secrets
-    firebase_key = json.loads(st.secrets["firebase_key"])
+    firebase_key_dict = st.secrets["firebase_key"]
 
     # Initialize Firebase
-    cred = credentials.Certificate(firebase_key)
+    cred = credentials.Certificate(firebase_key_dict)
     firebase_admin.initialize_app(cred)
 
 # Get Firestore database instance
