@@ -1,10 +1,12 @@
 streamlit
 pydub
+ffmpeg
 ffmpeg-python
 firebase-admin
 faster-whisper
 transformers
 torch
 sentencepiece
+
 
 
