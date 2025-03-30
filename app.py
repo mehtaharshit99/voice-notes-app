@@ -1,36 +1,43 @@
-import asyncio
-import torch
+# app.py - Streamlit UI and Firebase Integration
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer
+import firebase_admin
+from firebase_admin import credentials, firestore
+import os
 from model.whisper import transcribe_audio
 from model.summarizer import summarize_text
+import tempfile
 
-# Ensure an event loop is running for async operations
-try:
-    asyncio.get_running_loop()
-except RuntimeError:
-    asyncio.set_event_loop(asyncio.new_event_loop())
+# Initialize Firebase
+if not firebase_admin._apps:
+    cred = credentials.Certificate("path/to/your/firebase/credentials.json")
+    firebase_admin.initialize_app(cred)
+db = firestore.client()
 
-# Set device for Torch (CPU/GPU handling)
-device = "cuda" if torch.cuda.is_available() else "cpu"
-st.write(f"Device set to use {device}")
+def store_transcription(filename, transcription, summary):
+    """Stores the transcription and summary in Firebase."""
+    doc_ref = db.collection("transcriptions").document(filename)
+    doc_ref.set({"transcription": transcription, "summary": summary})
 
-# Streamlit UI
-st.title("Voice Notes App")
-
-# WebRTC Configuration Fix
-webrtc_ctx = webrtc_streamer(
-    key="speech-recognition",
-    frontend_rtc_configuration={},
-    server_rtc_configuration={}
-)
-
-if st.button("Transcribe Audio"):
-    audio_path = "recorded_audio.wav"  # Placeholder for actual recorded file path
-    transcription = transcribe_audio(audio_path)
-    st.write("**Transcription:**", transcription)
-    
+def process_audio_file(audio_file):
+    """Processes an uploaded audio file."""
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
+        temp_audio.write(audio_file.read())
+        temp_audio_path = temp_audio.name
+    transcription = transcribe_audio(temp_audio_path)
     summary = summarize_text(transcription)
-    st.write("**Summary:**", summary)
+    store_transcription(audio_file.name, transcription, summary)
+    os.remove(temp_audio_path)
+    return transcription, summary
 
-st.write("📌 Record audio, transcribe, and summarize your voice notes!")
+st.title("Voice Notes Transcription & Summarization")
+
+# Upload audio file
+uploaded_file = st.file_uploader("Upload an audio file", type=["wav", "mp3", "m4a"])
+if uploaded_file:
+    st.write("Processing audio...")
+    transcription, summary = process_audio_file(uploaded_file)
+    st.subheader("Transcription")
+    st.write(transcription)
+    st.subheader("Summary")
+    st.write(summary)
+    st.success("Transcription and summary saved successfully!")
