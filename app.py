@@ -1,12 +1,22 @@
 import streamlit as st
 import os
 import tempfile
-from model.whisper import transcribe_audio
-from model.summarizer import summarize_text
+from whisper import transcribe_audio  # Ensure correct import
+from summarizer import summarize_text  # Ensure correct import
 from firebase_config import save_transcription, get_all_transcriptions
 from fpdf import FPDF
 from streamlit_webrtc import webrtc_streamer, WebRtcMode, AudioProcessorBase
 import av
+import asyncio
+
+# Ensure AsyncIO Event Loop
+def ensure_event_loop():
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        asyncio.set_event_loop(asyncio.new_event_loop())
+
+ensure_event_loop()
 
 # Set up Streamlit UI
 st.title("🎤 Voice Notes AI - Record, Upload & Transcribe")
@@ -14,7 +24,8 @@ st.title("🎤 Voice Notes AI - Record, Upload & Transcribe")
 # WebRTC Audio Processor Class
 class AudioProcessor(AudioProcessorBase):
     def recv_audio(self, frame: av.AudioFrame) -> av.AudioFrame:
-        return frame
+        raw_audio = frame.to_ndarray()
+        return av.AudioFrame.from_ndarray(raw_audio, format="s16")
 
 # 📌 **Audio Recording using WebRTC**
 st.subheader("🎤 Record Audio")
@@ -23,8 +34,10 @@ webrtc_ctx = webrtc_streamer(
     mode=WebRtcMode.SENDRECV,
     audio_processor_factory=AudioProcessor,
     media_stream_constraints={"video": False, "audio": True},
+    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
 )
 
+audio_path = None
 if webrtc_ctx.audio_receiver:
     audio_frames = webrtc_ctx.audio_receiver.get_frames()
     if audio_frames:
@@ -38,7 +51,6 @@ if webrtc_ctx.audio_receiver:
 st.subheader("📂 Upload an Audio File")
 uploaded_file = st.file_uploader("Choose a WAV file", type=["wav"])
 
-audio_path = None
 if uploaded_file:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
         temp_audio.write(uploaded_file.read())

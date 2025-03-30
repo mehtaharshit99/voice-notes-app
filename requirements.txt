@@ -5,13 +5,17 @@ ffmpeg-python
 firebase-admin
 faster-whisper
 transformers
-torch
 sentencepiece
 sounddevice
 pyaudio
 numpy
 fpdf
+torch
+torchvision
+torchaudio
 streamlit-webrtc
+aioice
+av
 
 
 
