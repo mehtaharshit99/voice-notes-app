@@ -2,78 +2,85 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, firestore
 import os
-import tempfile
-from fpdf import FPDF
-from model.whisper import transcribe_audio
-from model.summarizer import summarize_text
+from io import BytesIO
+import wave
+import numpy as np
+import librosa
+from model.whisper import transcribe_audio  # Assuming you have this function in model/whisper.py
+from model.summarizer import summarize_text  # Assuming you have this function in model/summarizer.py
 
-# Firebase initialization using Streamlit secrets
-try:
-    if not firebase_admin._apps:
-        # Fetch Firebase credentials from Streamlit secrets
+# Initialize Firebase using Streamlit Secrets
+if not firebase_admin._apps:
+    try:
+        # Retrieve Firebase credentials from Streamlit secrets
         firebase_config = st.secrets["firebase"]
-        cred = credentials.Certificate(firebase_config)
+        
+        # Firebase credentials in dictionary format
+        cred_dict = {
+            "project_id": firebase_config["project_id"],
+            "private_key_id": firebase_config["private_key_id"],
+            "private_key": firebase_config["private_key"],
+            "client_email": firebase_config["client_email"],
+            "client_id": firebase_config["client_id"],
+            "auth_uri": firebase_config["auth_uri"],
+            "token_uri": firebase_config["token_uri"],
+            "auth_provider_x509_cert_url": firebase_config["auth_provider_x509_cert_url"],
+            "client_x509_cert_url": firebase_config["client_x509_cert_url"]
+        }
+
+        # Initialize Firebase with the credentials
+        cred = credentials.Certificate(cred_dict)
         firebase_admin.initialize_app(cred)
-    db = firestore.client()  # Initialize Firestore after Firebase app is initialized
+        st.success("Firebase initialized successfully.")
+    except Exception as e:
+        st.error(f"Error initializing Firebase: {e}")
 
-except KeyError as e:
-    st.error(f"Error: Firebase configuration is missing in Streamlit secrets. Please add the 'firebase' key to your Streamlit secrets. Details: {e}")
-except Exception as e:
-    st.error(f"Error initializing Firebase: {e}")
+# Firebase Firestore client
+db = firestore.client()
 
-MAX_FILE_SIZE_MB = 200
-
+# Function to store transcription and summary in Firebase
 def store_transcription(filename, transcription, summary):
     """Stores the transcription and summary in Firebase."""
-    doc_ref = db.collection("transcriptions").document(filename)
-    doc_ref.set({"transcription": transcription, "summary": summary})
+    try:
+        doc_ref = db.collection("transcriptions").document(filename)
+        doc_ref.set({
+            "transcription": transcription,
+            "summary": summary
+        })
+        st.success("Transcription and summary stored in Firebase.")
+    except Exception as e:
+        st.error(f"Error storing transcription in Firebase: {e}")
 
+# Function to process uploaded audio files
 def process_audio_file(audio_file):
-    """Processes an uploaded audio file."""
-    if audio_file.size > MAX_FILE_SIZE_MB * 1024 * 1024:
-        st.error("File size exceeds 200MB limit.")
-        return None, None
-    
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
-        temp_audio.write(audio_file.read())
-        temp_audio_path = temp_audio.name
-    
+    """Process the uploaded audio file, transcribe and summarize."""
+    # Temporarily save the audio file
+    temp_audio_path = os.path.join("temp_audio.wav")
+    with open(temp_audio_path, "wb") as f:
+        f.write(audio_file.getbuffer())
+
     # Transcribe and summarize
     transcription = transcribe_audio(temp_audio_path)
     summary = summarize_text(transcription)
+
+    # Store the transcription and summary in Firebase
     store_transcription(audio_file.name, transcription, summary)
-    
-    # Clean up
+
+    # Clean up the temporary file
     os.remove(temp_audio_path)
-    
+
     return transcription, summary
 
-def save_transcription_as_pdf(filename, transcription, summary):
-    """Saves the transcription and summary as a PDF file."""
-    pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, "Transcription & Summary", ln=True, align='C')
-    pdf.ln(10)
-    pdf.multi_cell(0, 10, f"Transcription:\n{transcription}\n\nSummary:\n{summary}")
-    pdf_path = f"{filename}.pdf"
-    pdf.output(pdf_path)
-    return pdf_path
-
-st.title("Voice Notes Transcription & Summarization")
-
-# Upload audio file
-st.subheader("Upload a .wav file")
+# Streamlit UI components
+st.title("Voice Notes Transcription and Summarization")
 uploaded_file = st.file_uploader("Choose an audio file", type=["wav"])
+
 if uploaded_file:
     st.write("Processing audio...")
     transcription, summary = process_audio_file(uploaded_file)
+    
     if transcription and summary:
         st.subheader("Transcription")
         st.write(transcription)
         st.subheader("Summary")
         st.write(summary)
-        pdf_path = save_transcription_as_pdf(uploaded_file.name, transcription, summary)
-        st.download_button(label="Download PDF", data=open(pdf_path, "rb").read(), file_name="transcription.pdf", mime="application/pdf")
-        st.success("Transcription and summary saved successfully!")

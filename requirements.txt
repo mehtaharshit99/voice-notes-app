@@ -16,7 +16,7 @@ torchaudio
 streamlit-webrtc
 aioice
 av
-
-
-
-
+librosa
+requests  # Sometimes needed for API interactions and model downloads
+google-cloud-firestore  # For Firebase Firestore client
+protobuf  # May be needed for gRPC or Firebase communication
