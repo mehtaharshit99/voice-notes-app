@@ -10,9 +10,10 @@ from fpdf import FPDF
 from faster_whisper import WhisperModel
 from transformers import pipeline
 
-# Initialize Firebase
+# Initialize Firebase using Streamlit Secrets
 if not firebase_admin._apps:
-    cred = credentials.Certificate("path/to/your/firebase/credentials.json")
+    firebase_config = st.secrets["firebase"]
+    cred = credentials.Certificate(firebase_config)
     firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -71,9 +72,9 @@ def record_audio():
     st.write(f"Click below to start recording (Max {MAX_RECORDING_DURATION} seconds)")
     audio = st.audio_recorder(max_duration=MAX_RECORDING_DURATION)
     if audio:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
-            temp_audio.write(audio)
-            temp_audio_path = temp_audio.name
+        temp_audio_path = tempfile.NamedTemporaryFile(delete=False, suffix=".wav").name
+        with open(temp_audio_path, "wb") as f:
+            f.write(audio)
         return temp_audio_path
     return None
 
