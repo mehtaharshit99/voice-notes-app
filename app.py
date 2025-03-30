@@ -14,7 +14,7 @@ try:
         firebase_config = st.secrets["firebase"]
         cred = credentials.Certificate(firebase_config)
         firebase_admin.initialize_app(cred)
-    db = firestore.client()
+    db = firestore.client()  # Initialize Firestore after Firebase app is initialized
 
 except KeyError as e:
     st.error(f"Error: Firebase configuration is missing in Streamlit secrets. Please add the 'firebase' key to your Streamlit secrets. Details: {e}")
