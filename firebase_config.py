@@ -1,19 +1,22 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
 import streamlit as st
+import json
 
-# Ensure Firebase is only initialized once
+# Ensure Firebase is initialized only once
 if not firebase_admin._apps:
     try:
         # Load Firebase credentials from Streamlit secrets
-        firebase_key_dict = st.secrets["firebase_key"]
+        firebase_key_dict = json.loads(st.secrets["firebase_key"])
 
         # Initialize Firebase
         cred = credentials.Certificate(firebase_key_dict)
         firebase_admin.initialize_app(cred)
 
+        st.success("✅ Firebase initialized successfully!")
+
     except Exception as e:
-        st.error(f"❌ Firebase initialization error: {e}")
+        st.error(f"❌ Error initializing Firebase: {e}")
 
 # Get Firestore database instance
 db = firestore.client()
@@ -42,3 +45,4 @@ def get_all_transcriptions():
     except Exception as e:
         st.error(f"❌ Error fetching transcriptions: {e}")
     return transcriptions
+
