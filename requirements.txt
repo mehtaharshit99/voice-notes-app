@@ -11,6 +11,7 @@ sounddevice
 pyaudio
 numpy
 fpdf
+streamlit-webrtc
 
 
 
