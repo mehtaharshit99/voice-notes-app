@@ -5,10 +5,10 @@ from firebase_admin import credentials, firestore
 import os
 import tempfile
 import wave
-from model.whisper import transcribe_audio
-from model.summarizer import summarize_text
 from io import BytesIO
 from fpdf import FPDF
+from faster_whisper import WhisperModel
+from transformers import pipeline
 
 # Initialize Firebase
 if not firebase_admin._apps:
@@ -18,6 +18,20 @@ db = firestore.client()
 
 MAX_FILE_SIZE_MB = 200
 MAX_RECORDING_DURATION = 60  # in seconds
+
+# Load Faster Whisper Model
+def transcribe_audio(audio_path):
+    model = WhisperModel("base")
+    segments, _ = model.transcribe(audio_path)
+    transcription = " ".join(segment.text for segment in segments)
+    return transcription
+
+# Load Summarization Model
+summarizer = pipeline("summarization")
+
+def summarize_text(text):
+    summary = summarizer(text, max_length=150, min_length=50, do_sample=False)
+    return summary[0]["summary_text"]
 
 def store_transcription(filename, transcription, summary):
     """Stores the transcription and summary in Firebase."""
