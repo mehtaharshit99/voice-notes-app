@@ -9,11 +9,13 @@ from io import BytesIO
 from fpdf import FPDF
 from faster_whisper import WhisperModel
 from transformers import pipeline
+import json
 
 # Initialize Firebase using Streamlit Secrets
 if not firebase_admin._apps:
-    firebase_config = st.secrets["firebase"]
+    firebase_config = json.loads(st.secrets["firebase"])  # Convert TOML to JSON
     cred = credentials.Certificate(firebase_config)
+
     firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -109,4 +111,4 @@ if uploaded_file:
         pdf_path = save_transcription_as_pdf(uploaded_file.name, transcription, summary)
         st.download_button(label="Download PDF", data=open(pdf_path, "rb").read(), file_name="transcription.pdf", mime="application/pdf")
         st.success("Transcription and summary saved successfully!")
-st.write(st.secrets)
+
