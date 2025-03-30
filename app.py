@@ -109,3 +109,4 @@ if uploaded_file:
         pdf_path = save_transcription_as_pdf(uploaded_file.name, transcription, summary)
         st.download_button(label="Download PDF", data=open(pdf_path, "rb").read(), file_name="transcription.pdf", mime="application/pdf")
         st.success("Transcription and summary saved successfully!")
+st.write(st.secrets)
