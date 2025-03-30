@@ -6,7 +6,7 @@ import streamlit as st
 if not firebase_admin._apps:
     try:
         # Get Firebase credentials from Streamlit secrets
-        firebase_key_dict = st.secrets["firebase_key"]
+        firebase_key_dict = dict(st.secrets["firebase_key"])  # Explicitly convert to dictionary
 
         # Initialize Firebase
         cred = credentials.Certificate(firebase_key_dict)
