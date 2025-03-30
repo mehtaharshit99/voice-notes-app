@@ -1,4 +1,4 @@
-# app.py - Streamlit UI and Firebase Integration
+# app.py - Streamlit UI and Firebase Integration for Cloud Deployment
 import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -11,13 +11,20 @@ import json
 from model.whisper import transcribe_audio
 from model.summarizer import summarize_text
 
-# Initialize Firebase using Streamlit Secrets
-if not firebase_admin._apps:
-    firebase_config = json.loads(st.secrets["firebase"])  # Convert TOML to JSON
-    cred = credentials.Certificate(firebase_config)
-    firebase_admin.initialize_app(cred)
+# Initialize Firebase using Streamlit Cloud Secrets
+try:
+    if not firebase_admin._apps:
+        # Fetching Firebase credentials directly from Streamlit Secrets
+        firebase_config = st.secrets["firebase"]
+        cred = credentials.Certificate(firebase_config)
+        firebase_admin.initialize_app(cred)
 
-db = firestore.client()
+    db = firestore.client()
+
+except KeyError as e:
+    st.error(f"Error: Firebase configuration is missing in Streamlit secrets. Please add the 'firebase' key to your secrets in Streamlit Cloud. Details: {e}")
+except Exception as e:
+    st.error(f"Error initializing Firebase: {e}")
 
 MAX_FILE_SIZE_MB = 200
 MAX_RECORDING_DURATION = 60  # in seconds
