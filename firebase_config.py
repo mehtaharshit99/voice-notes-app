@@ -1,3 +1,5 @@
+import os
+import json
 import firebase_admin
 from firebase_admin import credentials, firestore
 import streamlit as st
@@ -5,16 +7,26 @@ import streamlit as st
 # Ensure Firebase is only initialized once
 if not firebase_admin._apps:
     try:
-        # Load Firebase credentials from Streamlit secrets
-        firebase_key_dict = st.secrets["firebase_key"]
+        firebase_key_dict = None
+
+        # ✅ Streamlit Cloud: Use st.secrets
+        if "firebase_key" in st.secrets:
+            firebase_key_dict = json.loads(st.secrets["firebase_key"])
+
+        # ✅ Local/Production: Use environment variable
+        elif os.getenv("GOOGLE_APPLICATION_CREDENTIALS"):
+            firebase_key_dict = json.loads(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+
+        else:
+            raise ValueError("❌ Firebase credentials not found! Set up Streamlit secrets or an environment variable.")
 
         # Initialize Firebase
         cred = credentials.Certificate(firebase_key_dict)
         firebase_admin.initialize_app(cred)
-        st.success("✅ Firebase initialized successfully!")
+        print("✅ Firebase initialized successfully!")
 
     except Exception as e:
-        st.error(f"❌ Error initializing Firebase: {e}")
+        print(f"❌ Error initializing Firebase: {e}")
 
 # Get Firestore database instance
 db = firestore.client()
@@ -29,9 +41,9 @@ def save_transcription(audio_name, transcription, summary):
             "summary": summary,
             "timestamp": firestore.SERVER_TIMESTAMP
         })
-        st.success("✅ Transcription saved successfully!")
+        print("✅ Transcription saved successfully!")
     except Exception as e:
-        st.error(f"❌ Error saving transcription: {e}")
+        print(f"❌ Error saving transcription: {e}")
 
 def get_all_transcriptions():
     """Fetches all stored transcriptions sorted by timestamp (latest first)."""
@@ -41,5 +53,5 @@ def get_all_transcriptions():
         for doc in docs:
             transcriptions.append(doc.to_dict())
     except Exception as e:
-        st.error(f"❌ Error fetching transcriptions: {e}")
+        print(f"❌ Error fetching transcriptions: {e}")
     return transcriptions
