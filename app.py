@@ -1,69 +1,54 @@
+import os
 import asyncio
-import tempfile
 import torch
-import streamlit as st
-from transformers import pipeline
-from streamlit_webrtc import webrtc_streamer, WebRtcMode
+from streamlit_webrtc import webrtc_streamer
 from faster_whisper import WhisperModel
+from transformers import pipeline
+import streamlit as st
 
-# Ensure an active event loop
+# Ensure event loop is initialized
+try:
+    asyncio.get_running_loop()
+except RuntimeError:
+    asyncio.set_event_loop(asyncio.new_event_loop())
 
-def get_or_create_eventloop():
-    try:
-        return asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        return loop
+# Set environment variables to fix Streamlit path issues
+os.environ["STREAMLIT_WATCH_FILES"] = "false"
 
-get_or_create_eventloop()
-
-# Load Whisper Model for Speech-to-Text
 def transcribe_audio(audio_path):
-    model = WhisperModel("medium", compute_type="float32")
+    """Transcribes audio using Faster-Whisper with English language preference."""
+    model = WhisperModel("medium", compute_type="float32")  # Change model size if needed
     segments, _ = model.transcribe(audio_path, language="en")
-    transcription = " ".join(segment.text for segment in segments)
-    return transcription.strip()
+    return " ".join(segment.text for segment in segments).strip()
 
-# Load Summarizer Model
+# Auto-detect device (force CPU if CUDA is unavailable)
 device = 0 if torch.cuda.is_available() else -1
+torch.set_default_device("cpu")
+
+# Load BART summarization model
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device=device)
 
 def summarize_text(text, max_chunk_length=1024):
+    """Summarizes long text by splitting it into chunks."""
     if len(text) < 50:
         return "⚠️ Text is too short to summarize."
+    
     chunks = [text[i:i + max_chunk_length] for i in range(0, len(text), max_chunk_length)]
     summaries = summarizer(chunks, max_length=150, min_length=50, do_sample=False)
-    summarized_text = " ".join([s["summary_text"] for s in summaries])
-    return summarized_text
+    return " ".join([s["summary_text"] for s in summaries])
 
 # Streamlit UI
-st.title("🎙 Voice Notes App")
-st.write("Record audio, transcribe it, and generate summaries.")
-
+st.title("Voice Notes App")
 webrtc_ctx = webrtc_streamer(
-    key="audio_recorder",
-    mode=WebRtcMode.SENDRECV,
-    media_stream_constraints={"video": False, "audio": True},
-    frontend_rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-    server_rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+    key="speech-to-text",
+    rtc_configuration={"iceServers": []},  # Use empty ICE servers if needed
 )
 
-if webrtc_ctx.audio_receiver:
-    audio_frames = webrtc_ctx.audio_receiver.get_frames()
-    if audio_frames:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
-            for frame in audio_frames:
-                temp_audio.write(frame.to_ndarray().tobytes())
-            audio_path = temp_audio.name
-        
-        st.success("✅ Recording complete! You can now transcribe it.")
-        st.audio(audio_path, format="audio/wav")
-        
-        if st.button("Transcribe Audio"):
-            transcript = transcribe_audio(audio_path)
-            st.text_area("📜 Transcription:", transcript, height=200)
-            
-            if st.button("Summarize Text"):
-                summary = summarize_text(transcript)
-                st.text_area("📝 Summary:", summary, height=150)
+if st.button("Process Audio"):
+    audio_file = "recorded_audio.wav"  # Placeholder for actual audio file
+    transcription = transcribe_audio(audio_file)
+    summary = summarize_text(transcription)
+    st.text_area("Transcription", transcription, height=200)
+    st.text_area("Summary", summary, height=100)
+
+st.write("📌 Ensure microphone permissions are enabled.")
