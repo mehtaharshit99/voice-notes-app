@@ -1,9 +1,8 @@
 import streamlit as st
 import os
 import wave
-import time
 import numpy as np
-import sounddevice as sd
+import pyaudio
 from pydub import AudioSegment
 from model.whisper import transcribe_audio
 from model.summarizer import summarize_text
@@ -13,31 +12,39 @@ from fpdf import FPDF
 # Set up Streamlit UI
 st.title("🎤 Voice Notes AI - Record, Upload & Transcribe")
 
-# Set FFmpeg path (for Pydub)
-AudioSegment.converter = "C:\\ffmpeg\\bin\\ffmpeg.exe"
-
 # Create recordings directory if it doesn't exist
 os.makedirs("recordings", exist_ok=True)
 
 # Audio recording settings
 SAMPLE_RATE = 44100  # CD quality
 CHANNELS = 1  # Mono audio
+CHUNK = 1024  # Buffer size
+FORMAT = pyaudio.paInt16
 
 def record_audio(duration=5, filename="recordings/recorded_audio.wav"):
     """Records audio for a given duration and saves it as a WAV file."""
     st.info(f"Recording for {duration} seconds... 🎙️")
-    
-    # Record audio
-    recording = sd.rec(int(duration * SAMPLE_RATE), samplerate=SAMPLE_RATE, channels=CHANNELS, dtype=np.int16)
-    sd.wait()  # Wait for recording to finish
-    
-    # Save as WAV file
+
+    audio = pyaudio.PyAudio()
+    stream = audio.open(format=FORMAT, channels=CHANNELS,
+                        rate=SAMPLE_RATE, input=True,
+                        frames_per_buffer=CHUNK)
+
+    frames = []
+    for _ in range(0, int(SAMPLE_RATE / CHUNK * duration)):
+        data = stream.read(CHUNK)
+        frames.append(data)
+
+    stream.stop_stream()
+    stream.close()
+    audio.terminate()
+
     with wave.open(filename, "wb") as wf:
         wf.setnchannels(CHANNELS)
-        wf.setsampwidth(2)  # 16-bit PCM
+        wf.setsampwidth(audio.get_sample_size(FORMAT))
         wf.setframerate(SAMPLE_RATE)
-        wf.writeframes(recording.tobytes())
-    
+        wf.writeframes(b''.join(frames))
+
     st.success(f"✅ Recording saved as {filename}")
     return filename
 

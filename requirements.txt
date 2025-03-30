@@ -9,6 +9,9 @@ torch
 sentencepiece
 sounddevice
 pyaudio
+numpy
+fpdf
+
 
 
 
