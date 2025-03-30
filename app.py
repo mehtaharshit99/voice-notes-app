@@ -32,7 +32,7 @@ def process_audio_file(audio_file):
 st.title("Voice Notes Transcription & Summarization")
 
 # Upload audio file
-uploaded_file = st.file_uploader("Upload an audio file", type=["wav", "mp3", "m4a"])
+uploaded_file = st.file_uploader("Upload a .wav audio file", type=["wav"])
 if uploaded_file:
     st.write("Processing audio...")
     transcription, summary = process_audio_file(uploaded_file)
