@@ -1,111 +1,69 @@
-import streamlit as st
-import os
-import tempfile
-from model.whisper import transcribe_audio  # Ensure correct import
-from model.summarizer import summarize_text  # Ensure correct import
-from firebase_config import save_transcription, get_all_transcriptions
-from fpdf import FPDF
-from streamlit_webrtc import webrtc_streamer, WebRtcMode, AudioProcessorBase
-import av
 import asyncio
+import tempfile
+import torch
+import streamlit as st
+from transformers import pipeline
+from streamlit_webrtc import webrtc_streamer, WebRtcMode
+from faster_whisper import WhisperModel
 
-# Ensure AsyncIO Event Loop
-def ensure_event_loop():
+# Ensure an active event loop
+
+def get_or_create_eventloop():
     try:
-        asyncio.get_running_loop()
+        return asyncio.get_running_loop()
     except RuntimeError:
-        asyncio.set_event_loop(asyncio.new_event_loop())
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop
 
-ensure_event_loop()
+get_or_create_eventloop()
 
-# Set up Streamlit UI
-st.title("🎤 Voice Notes AI - Record, Upload & Transcribe")
+# Load Whisper Model for Speech-to-Text
+def transcribe_audio(audio_path):
+    model = WhisperModel("medium", compute_type="float32")
+    segments, _ = model.transcribe(audio_path, language="en")
+    transcription = " ".join(segment.text for segment in segments)
+    return transcription.strip()
 
-# WebRTC Audio Processor Class
-class AudioProcessor(AudioProcessorBase):
-    def recv_audio(self, frame: av.AudioFrame) -> av.AudioFrame:
-        raw_audio = frame.to_ndarray()
-        return av.AudioFrame.from_ndarray(raw_audio, format="s16")
+# Load Summarizer Model
+device = 0 if torch.cuda.is_available() else -1
+summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device=device)
 
-# 📌 **Audio Recording using WebRTC**
-st.subheader("🎤 Record Audio")
+def summarize_text(text, max_chunk_length=1024):
+    if len(text) < 50:
+        return "⚠️ Text is too short to summarize."
+    chunks = [text[i:i + max_chunk_length] for i in range(0, len(text), max_chunk_length)]
+    summaries = summarizer(chunks, max_length=150, min_length=50, do_sample=False)
+    summarized_text = " ".join([s["summary_text"] for s in summaries])
+    return summarized_text
+
+# Streamlit UI
+st.title("🎙 Voice Notes App")
+st.write("Record audio, transcribe it, and generate summaries.")
+
 webrtc_ctx = webrtc_streamer(
     key="audio_recorder",
     mode=WebRtcMode.SENDRECV,
-    audio_processor_factory=AudioProcessor,
     media_stream_constraints={"video": False, "audio": True},
-    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+    frontend_rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+    server_rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
 )
 
-audio_path = None
 if webrtc_ctx.audio_receiver:
     audio_frames = webrtc_ctx.audio_receiver.get_frames()
     if audio_frames:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
-            temp_audio.write(audio_frames[0].to_ndarray().tobytes())
+            for frame in audio_frames:
+                temp_audio.write(frame.to_ndarray().tobytes())
             audio_path = temp_audio.name
-            st.success("✅ Recording complete! You can now transcribe it.")
-            st.audio(audio_path, format="audio/wav")
-
-# 📂 **Upload an Audio File**
-st.subheader("📂 Upload an Audio File")
-uploaded_file = st.file_uploader("Choose a WAV file", type=["wav"])
-
-if uploaded_file:
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
-        temp_audio.write(uploaded_file.read())
-        audio_path = temp_audio.name
-    st.success(f"✅ File uploaded and saved as {audio_path}")
-    st.audio(audio_path, format="audio/wav")
-
-# **Proceed with Transcription if a file is available**
-if audio_path:
-    # 💜 **Transcription**
-    st.write("⏳ Transcribing...")
-    transcription = transcribe_audio(audio_path)
-    st.subheader("📝 Transcription")
-    st.write(transcription)
-
-    # 📌 **Auto Summarization**
-    st.write("⏳ Generating Summary...")
-    summary = summarize_text(transcription)
-    st.subheader("📌 Summary & Action Items")
-    st.write(summary)
-
-    # 👥 **Save to Database**
-    save_transcription(os.path.basename(audio_path), transcription, summary)
-    st.success("✅ Transcription and summary saved to Firestore!")
-
-    # 📅 **Download as TXT or PDF**
-    def download_notes(format):
-        """Generate and download transcription and summary."""
-        content = f"Transcription:\n{transcription}\n\nSummary:\n{summary}"
-        filename = f"voice_notes.{format}"
         
-        if format == "txt":
-            st.download_button(label="📥 Download TXT", data=content, file_name=filename, mime="text/plain")
-        elif format == "pdf":
-            pdf = FPDF()
-            pdf.add_page()
-            pdf.set_font("Arial", size=12)
-            pdf.multi_cell(0, 10, content)
-            pdf.output(filename)
-            with open(filename, "rb") as pdf_file:
-                st.download_button(label="📥 Download PDF", data=pdf_file, file_name=filename, mime="application/pdf")
-
-    download_notes("txt")
-    download_notes("pdf")
-
-# 📝 **Retrieve Previous Transcriptions**
-st.subheader("📜 View Saved Transcriptions")
-transcriptions = get_all_transcriptions()
-
-if transcriptions:
-    for entry in transcriptions:
-        with st.expander(f"{entry['audio_name']} - {entry['timestamp']}"):
-            st.write("📝 **Transcription:**")
-            st.write(entry["transcription"])
-            st.write("📌 **Summary:**")
-            st.write(entry["summary"])
-else:
-    st.write("No transcriptions saved yet.")
+        st.success("✅ Recording complete! You can now transcribe it.")
+        st.audio(audio_path, format="audio/wav")
+        
+        if st.button("Transcribe Audio"):
+            transcript = transcribe_audio(audio_path)
+            st.text_area("📜 Transcription:", transcript, height=200)
+            
+            if st.button("Summarize Text"):
+                summary = summarize_text(transcript)
+                st.text_area("📝 Summary:", summary, height=150)
