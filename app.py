@@ -1,8 +1,8 @@
 import streamlit as st
 import os
 import tempfile
-from whisper import transcribe_audio  # Ensure correct import
-from summarizer import summarize_text  # Ensure correct import
+from model.whisper import transcribe_audio  # Ensure correct import
+from model.summarizer import summarize_text  # Ensure correct import
 from firebase_config import save_transcription, get_all_transcriptions
 from fpdf import FPDF
 from streamlit_webrtc import webrtc_streamer, WebRtcMode, AudioProcessorBase
