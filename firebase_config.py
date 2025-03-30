@@ -1,13 +1,12 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
 import streamlit as st
-import json
 
 # Ensure Firebase is initialized only once
 if not firebase_admin._apps:
     try:
-        # Convert Streamlit secret to a valid dictionary
-        firebase_key_dict = json.loads(st.secrets["firebase_key"])
+        # Get Firebase credentials from Streamlit secrets
+        firebase_key_dict = st.secrets["firebase_key"]
 
         # Initialize Firebase
         cred = credentials.Certificate(firebase_key_dict)
