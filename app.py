@@ -4,37 +4,23 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import os
 import tempfile
-import wave
-from io import BytesIO
 from fpdf import FPDF
-from faster_whisper import WhisperModel
-from transformers import pipeline
 import json
+
+# Import the transcription and summarization functions from external modules
+from model.whisper import transcribe_audio
+from model.summarizer import summarize_text
 
 # Initialize Firebase using Streamlit Secrets
 if not firebase_admin._apps:
     firebase_config = json.loads(st.secrets["firebase"])  # Convert TOML to JSON
     cred = credentials.Certificate(firebase_config)
-
     firebase_admin.initialize_app(cred)
+
 db = firestore.client()
 
 MAX_FILE_SIZE_MB = 200
 MAX_RECORDING_DURATION = 60  # in seconds
-
-# Load Faster Whisper Model
-def transcribe_audio(audio_path):
-    model = WhisperModel("base")
-    segments, _ = model.transcribe(audio_path)
-    transcription = " ".join(segment.text for segment in segments)
-    return transcription
-
-# Load Summarization Model
-summarizer = pipeline("summarization")
-
-def summarize_text(text):
-    summary = summarizer(text, max_length=150, min_length=50, do_sample=False)
-    return summary[0]["summary_text"]
 
 def store_transcription(filename, transcription, summary):
     """Stores the transcription and summary in Firebase."""
@@ -50,10 +36,15 @@ def process_audio_file(audio_file):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
         temp_audio.write(audio_file.read())
         temp_audio_path = temp_audio.name
+    
+    # Transcribe and summarize
     transcription = transcribe_audio(temp_audio_path)
     summary = summarize_text(transcription)
     store_transcription(audio_file.name, transcription, summary)
+    
+    # Clean up
     os.remove(temp_audio_path)
+    
     return transcription, summary
 
 def save_transcription_as_pdf(filename, transcription, summary):
@@ -111,4 +102,3 @@ if uploaded_file:
         pdf_path = save_transcription_as_pdf(uploaded_file.name, transcription, summary)
         st.download_button(label="Download PDF", data=open(pdf_path, "rb").read(), file_name="transcription.pdf", mime="application/pdf")
         st.success("Transcription and summary saved successfully!")
-
