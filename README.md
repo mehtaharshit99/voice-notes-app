@@ -15,8 +15,8 @@ The Voice Notes App is a web-based application that allows users to upload audio
 - Frontend: Streamlit
 - Backend: Python
 - Machine Learning:
- - Speech-to-Text: Whisper by OpenAI
- - Summarization: T5 (Text-to-Text Transfer Transformer)
+   Speech-to-Text: Whisper by OpenAI
+   Summarization: T5 (Text-to-Text Transfer Transformer)
 - Database: Firebase Firestore
 - Authentication: Firebase Authentication
 - Deployment: Streamlit Cloud or any other cloud platform
