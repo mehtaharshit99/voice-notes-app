@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_allocation.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_converters.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_cpuload.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_debugprint.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_dither.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_front.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_process.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_ringbuffer.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_stream.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_trace.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\hostapi\skeleton\pa_hostapi_skeleton.c">
+      <Filter>hostapi\skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\os\win\pa_win_hostapis.c">
+      <Filter>os\win</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\os\win\pa_win_util.c">
+      <Filter>os\win</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\os\win\pa_win_waveformat.c">
+      <Filter>os\win</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\os\win\pa_win_wdmks_utils.c">
+      <Filter>os\win</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\os\win\pa_win_coinitialize.c">
+      <Filter>os\win</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\os\win\pa_x86_plain_converters.c">
+      <Filter>os\win</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\hostapi\dsound\pa_win_ds.c">
+      <Filter>hostapi\dsound</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\hostapi\dsound\pa_win_ds_dynlink.c">
+      <Filter>hostapi\dsound</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\hostapi\wmme\pa_win_wmme.c">
+      <Filter>hostapi\wmme</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\hostapi\wasapi\pa_win_wasapi.c">
+      <Filter>hostapi\wasapi</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\hostapi\wdmks\pa_win_wdmks.c">
+      <Filter>hostapi\wdmks</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\os\win\pa_win_coinitialize.h">
+      <Filter>os\win</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\os\win\pa_win_wdmks_utils.h">
+      <Filter>os\win</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\os\win\pa_x86_plain_converters.h">
+      <Filter>os\win</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\hostapi\dsound\pa_win_ds_dynlink.h">
+      <Filter>hostapi\dsound</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\build\options_cmake.h">
+      <Filter>cmake_generated</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\include\portaudio.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\include\pa_win_ds.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\include\pa_win_waveformat.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\include\pa_win_wmme.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\include\pa_win_wasapi.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\include\pa_win_wdmks.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_allocation.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_converters.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_cpuload.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_debugprint.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_dither.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_endianness.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_hostapi.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_memorybarrier.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_process.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_ringbuffer.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_stream.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_trace.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_types.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\src\common\pa_util.h">
+      <Filter>common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\voice_notes_app\pa_stable_v190700_20210406\portaudio\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="cmake_generated">
+      <UniqueIdentifier>{DB5B2A48-EA03-3E17-AC1C-BF9BF0CF7E90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{C5A01131-B277-37DD-ABF7-99484DE274D9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hostapi">
+      <UniqueIdentifier>{3D9B5A45-6D22-3DBA-9063-DB95561D6633}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hostapi\dsound">
+      <UniqueIdentifier>{657900B6-FE93-31D4-B82E-DDD8C0C8B4AC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hostapi\skeleton">
+      <UniqueIdentifier>{55859EC4-7586-375F-B11E-FE9D50A990C7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hostapi\wasapi">
+      <UniqueIdentifier>{8CC040CB-C8E9-3FF0-873D-D632FE9C9D3A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hostapi\wdmks">
+      <UniqueIdentifier>{8F115BAA-C10A-3C68-BE6D-C0417F65A369}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hostapi\wmme">
+      <UniqueIdentifier>{1729DC7E-37DF-3FE0-BE64-F49BD7A27158}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{6F0BFA65-858D-346C-B834-DAAE7D5EE4D1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="os">
+      <UniqueIdentifier>{28FF65DD-F914-321F-9765-D798B2A89D4A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="os\win">
+      <UniqueIdentifier>{A8849110-7413-3726-A94F-A6F7DF36AA64}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,6 @@
+C:/voice_notes_app/build/CMakeFiles/portaudio.dir
+C:/voice_notes_app/build/CMakeFiles/portaudio_static.dir
+C:/voice_notes_app/build/CMakeFiles/uninstall.dir
+C:/voice_notes_app/build/CMakeFiles/INSTALL.dir
+C:/voice_notes_app/build/CMakeFiles/ALL_BUILD.dir
+C:/voice_notes_app/build/CMakeFiles/ZERO_CHECK.dir
