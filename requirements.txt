@@ -1,22 +1,18 @@
 streamlit
+firebase-admin
+google-cloud-firestore
+requests
 pydub
 ffmpeg
-ffmpeg-python
-firebase-admin
-faster-whisper
-transformers
-sentencepiece
 sounddevice
 pyaudio
-numpy
-fpdf
+librosa
 torch
 torchvision
 torchaudio
-streamlit-webrtc
-aioice
-av
-librosa
-requests  # Sometimes needed for API interactions and model downloads
-google-cloud-firestore  # For Firebase Firestore client
-protobuf  # May be needed for gRPC or Firebase communication
+faster-whisper
+transformers
+sentencepiece
+fpdf
+numpy
+
