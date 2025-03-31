@@ -1,10 +1,7 @@
 from transformers import pipeline
 
-# Specify the model for summarization explicitly
-summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-6-6")
-
-
+summarizer = pipeline("summarization", model="google/pegasus-xsum")
 
 def summarize_text(text):
-    summary = summarizer(text, max_length=150, min_length=50, do_sample=False)
+    summary = summarizer(text, max_length=100, min_length=30, do_sample=False)
     return summary[0]["summary_text"]
