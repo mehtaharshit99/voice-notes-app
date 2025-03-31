@@ -66,18 +66,23 @@
 
 
 
-
 import streamlit as st
 import firebase_admin
-from firebase_admin import firestore
+from firebase_admin import credentials, firestore
 import os
 import librosa
 import torch
+import soundfile as sf
 from io import BytesIO
 import wave
 import numpy as np
 from model.whisper import transcribe_audio  # Assuming you have this function in model/whisper.py
 from model.summarizer import summarize_text  # Assuming you have this function in model/summarizer.py
+
+# Initialize Firebase if not already initialized
+if not firebase_admin._apps:
+    cred = credentials.Certificate(st.secrets["firebase"])
+    firebase_admin.initialize_app(cred)
 
 # Firebase Firestore client
 db = firestore.client()
@@ -98,13 +103,13 @@ def store_transcription(filename, transcription, summary):
 # Function to process uploaded audio files
 def process_audio_file(audio_file):
     """Process the uploaded audio file, transcribe and summarize."""
-    temp_audio_path = os.path.join("temp_audio.wav")
+    temp_audio_path = "temp_audio.wav"
     with open(temp_audio_path, "wb") as f:
         f.write(audio_file.getbuffer())
     
     # Downsample audio to 16kHz before processing
     y, sr = librosa.load(temp_audio_path, sr=16000)
-    librosa.output.write_wav(temp_audio_path, y, sr)
+    sf.write(temp_audio_path, y, sr)
     
     # Transcribe and summarize
     transcription = transcribe_audio(temp_audio_path)
