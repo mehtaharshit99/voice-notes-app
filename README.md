@@ -25,9 +25,9 @@ The Voice Notes App is a web-based application that allows users to upload audio
 
 ### Prerequisites:
 
-- **Python 3.x**
-- **pip** package manager
-- **Git** (optional, if you want to clone the repository)
+- Python 3.x
+- pip package manager
+- Git (optional, if you want to clone the repository)
 
 ### Steps to Install:
 
@@ -50,11 +50,11 @@ The Voice Notes App is a web-based application that allows users to upload audio
 ## Code Explanation:
 ### app.py:
 This is the main Streamlit file where the UI components are implemented. It handles:
--File uploads
--Speech-to-text processing
--Summarization
--Displaying results
--Storing results in Firebase
+- File uploads
+- Speech-to-text processing
+- Summarization
+- Displaying results
+- Storing results in Firebase
 
 ### model/summarizer.py:
 This file contains code for loading and using the T5 model to generate summaries of transcribed text. The T5 model is loaded using the Hugging Face transformers library.
@@ -63,18 +63,18 @@ This file contains code for loading and using the T5 model to generate summaries
 This file handles the transcription of audio using Whisper. The audio is processed and converted into text for summarization.
 
 ## Challenges Faced:
--Model Limitations: The initial summarization model provided summaries that often did not meet expectations. Alternatives like T5 were tested to improve results.
--Audio File Size: Handling larger audio files and ensuring they are uploaded without hitting Streamlit or Firebase limits was a challenge.
--Caching and Optimization: Efficient caching was implemented to ensure that the models (Whisper and T5) loaded quickly and did not affect performance.
+- Model Limitations: The initial summarization model provided summaries that often did not meet expectations. Alternatives like T5 were tested to improve results.
+- Audio File Size: Handling larger audio files and ensuring they are uploaded without hitting Streamlit or Firebase limits was a challenge.
+- Caching and Optimization: Efficient caching was implemented to ensure that the models (Whisper and T5) loaded quickly and did not affect performance.
 
 ## Future Improvements:
--Enhanced Summarization Models: Experiment with alternative models like Pegasus for improved summaries.
--Multilingual Support: Extend the app to support multiple languages for transcription and summarization.
--Additional Features: Implement sentiment analysis or topic modeling on the transcriptions to extract further insights.
+- Enhanced Summarization Models: Experiment with alternative models like Pegasus for improved summaries.
+- Multilingual Support: Extend the app to support multiple languages for transcription and summarization.
+- Additional Features: Implement sentiment analysis or topic modeling on the transcriptions to extract further insights.
 
 ## Acknowledgments:
--Hugging Face for providing the pre-trained T5 model and the transformers library.
--OpenAI for their Whisper model for transcription.
--Firebase for providing cloud storage and authentication services.
+- Hugging Face for providing the pre-trained T5 model and the transformers library.
+- OpenAI for their Whisper model for transcription.
+- Firebase for providing cloud storage and authentication services.
     
 
