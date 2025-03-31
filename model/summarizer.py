@@ -1,7 +1,8 @@
 from transformers import pipeline
 
 # Specify the model for summarization explicitly
-summarizer = pipeline("summarization", model="facebook/bart-large-cnn", use_fast=True)
+summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-6-6")
+
 
 
 def summarize_text(text):
