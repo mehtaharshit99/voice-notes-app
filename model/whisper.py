@@ -1,4 +1,4 @@
-# whisper.py
+
 from faster_whisper import WhisperModel
 
 def transcribe_audio(audio_path):

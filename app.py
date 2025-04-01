@@ -5,21 +5,21 @@ import os
 from model.whisper import transcribe_audio  
 from model.summarizer import summarize_text  
 
-# Initialize Firebase only if it's not already initialized
+#init firebase if not done already
 if not firebase_admin._apps:
     try:
         firebase_config = st.secrets["firebase"]
-        cred = credentials.Certificate(dict(firebase_config))  # Convert secrets to dict
+        cred = credentials.Certificate(dict(firebase_config))  
         firebase_admin.initialize_app(cred)
         st.success("Firebase initialized successfully.")
     except Exception as e:
         st.error(f"Error initializing Firebase: {e}")
-        st.stop()  # Stop execution if Firebase fails
+        st.stop()  
 
-# Firestore client
+
 db = firestore.client()
 
-# Function to store transcription and summary in Firebase
+# Function for storing transcription and summary in Firebase
 def store_transcription(filename, transcription, summary):
     """Stores transcription and summary in Firebase."""
     try:
@@ -43,7 +43,7 @@ def process_audio_file(audio_file):
         summary = summarize_text(transcription)
 
         store_transcription(audio_file.name, transcription, summary)
-        os.remove(temp_audio_path)  # Clean up
+        os.remove(temp_audio_path) 
 
         return transcription, summary
     except Exception as e:
